@@ -27,7 +27,7 @@ using namespace godot;
 
 void Toolchain::_register_methods() {
     register_fns(U(init), U(resource_dir), U(check_suitable_environment), U(cmake_path), U(compile),
-                 U(set_free), U(is_building), U(_physics_process), U(get_log));
+                 U(set_free), U(is_building), U(_physics_process), U(get_log), U(find_compilers));
     register_signals<Toolchain>("building", "built", "log");
 }
 
@@ -100,4 +100,17 @@ void Toolchain::set_free() {
     if (building)
         return Godot::print("Warning: BoardRunner queued to be freed while still building");
     queue_free();
+}
+
+Array Toolchain::find_compilers() {
+    Array result;
+    auto compilers = tc->find_compilers();
+    for (const smce::Toolchain::CompilerInformation ci : compilers) {
+        auto ciGodot = make_ref<Toolchain::CompilerInformation>();
+        ciGodot->name = ci.name;
+        ciGodot->path = ci.path;
+        ciGodot->version = ci.version;
+        result.push_back(ciGodot);
+    };
+    return result;
 }
