@@ -42,10 +42,7 @@ func set_master_manager(mngr) -> void:
 	master_manager = mngr
 	_reflect_profile()
 	
-var sketch_manager = null setget set_sketch_manager
-
-func set_sketch_manager(mngr) -> void:
-	sketch_manager = mngr
+var sketch_manager = null
 
 var unique_sketches: int = 0
 var boards: Array = []

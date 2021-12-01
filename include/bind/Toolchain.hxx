@@ -51,8 +51,9 @@ class Toolchain : public Node {
         String version;
 
         static void _register_methods();
-
         void _init() {}
+
+        static Ref<CompilerInformation> from(const smce::Toolchain::CompilerInformation& ci);
     };
 
     smce::Toolchain& native() { return *tc; }

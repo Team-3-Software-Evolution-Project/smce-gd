@@ -37,6 +37,14 @@ void Toolchain::CompilerInformation::_register_methods() {
     register_property("version", &CompilerInformation::version, String{});
 }
 
+Ref<Toolchain::CompilerInformation> Toolchain::CompilerInformation::from(const smce::Toolchain::CompilerInformation& ci) {
+    auto compiler = make_ref<Toolchain::CompilerInformation>();
+    compiler->name = ci.name.c_str();
+    compiler->path = ci.path.c_str();
+    compiler->version = ci.version.c_str();
+    return compiler;
+}
+
 #undef STR
 #undef U
 
@@ -118,21 +126,18 @@ Array Toolchain::find_compilers() {
     result.push_back(compilerDefault);
 
     auto compilers = tc->find_compilers();
-    for (const smce::Toolchain::CompilerInformation ci : compilers) {
-        auto compiler = make_ref<Toolchain::CompilerInformation>();
-        compiler->name = ci.name.c_str();
-        compiler->path = ci.path.c_str();
-        compiler->version = ci.version.c_str();
+    for (const smce::Toolchain::CompilerInformation& ci : compilers) {
+        auto compiler = Toolchain::CompilerInformation::from(ci);
         result.push_back(compiler);
-    };
+    }
 
     return result;
 }
 
 bool Toolchain::select_compiler(const Ref<Toolchain::CompilerInformation> selected_compiler) {
     smce::Toolchain::CompilerInformation ci;
-    ci.name = selected_compiler->name.alloc_c_string();
-    ci.path = selected_compiler->path.alloc_c_string();
-    ci.version = selected_compiler->version.alloc_c_string();
+    ci.name = std_str(selected_compiler->name);
+    ci.path = std_str(selected_compiler->path);
+    ci.version = std_str(selected_compiler->version);
     return tc->select_compiler(ci);
 }
