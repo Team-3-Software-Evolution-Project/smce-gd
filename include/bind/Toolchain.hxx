@@ -72,6 +72,7 @@ class Toolchain : public Node {
     void set_free();
 
     Array find_compilers();
+    bool select_compiler(Ref<Toolchain::CompilerInformation> selected_compiler);
 };
 
 } // namespace godot

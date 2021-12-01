@@ -68,3 +68,8 @@ func make_sketch(path: String):
 	
 	return GDResult.new()
 
+
+func set_compiler(compiler: CompilerInformation):
+	for toolchain in toolchains:
+		toolchain.select_compiler(compiler)
+		

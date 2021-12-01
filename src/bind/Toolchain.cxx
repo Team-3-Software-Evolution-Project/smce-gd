@@ -27,7 +27,7 @@ using namespace godot;
 
 void Toolchain::_register_methods() {
     register_fns(U(init), U(resource_dir), U(check_suitable_environment), U(cmake_path), U(compile),
-                 U(set_free), U(is_building), U(_physics_process), U(get_log), U(find_compilers));
+                 U(set_free), U(is_building), U(_physics_process), U(get_log), U(find_compilers), U(select_compiler));
     register_signals<Toolchain>("building", "built", "log");
 }
 
@@ -113,8 +113,8 @@ Array Toolchain::find_compilers() {
 
     auto compilerDefault = make_ref<Toolchain::CompilerInformation>();
     compilerDefault->name = "Default compiler";
-    compilerDefault->path = "";
-    compilerDefault->version = "";
+    compilerDefault->path = "-";
+    compilerDefault->version = "-";
     result.push_back(compilerDefault);
 
     auto compilers = tc->find_compilers();
@@ -127,4 +127,12 @@ Array Toolchain::find_compilers() {
     };
 
     return result;
+}
+
+bool Toolchain::select_compiler(const Ref<Toolchain::CompilerInformation> selected_compiler) {
+    smce::Toolchain::CompilerInformation ci;
+    ci.name = selected_compiler->name.alloc_c_string();
+    ci.path = selected_compiler->path.alloc_c_string();
+    ci.version = selected_compiler->version.alloc_c_string();
+    return tc->select_compiler(ci);
 }
