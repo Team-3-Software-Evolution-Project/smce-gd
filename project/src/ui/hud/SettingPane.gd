@@ -41,6 +41,11 @@ var master_manager = null setget set_master_manager
 func set_master_manager(mngr) -> void:
 	master_manager = mngr
 	_reflect_profile()
+	
+var sketch_manager = null setget set_sketch_manager
+
+func set_sketch_manager(mngr) -> void:
+	sketch_manager = mngr
 
 var unique_sketches: int = 0
 var boards: Array = []
@@ -57,6 +62,7 @@ func _ready():
 	compiler_btn.get_popup().connect("id_pressed", self, "_on_compiler_selected")
 	version_label.text = "SMCE-gd: %s" % Global.version
 	
+	profile.compiler.name = "Default (-)"
 	_update_envs()
 
 
@@ -82,7 +88,10 @@ func _reflect_profile() -> void:
 	world_list.select(Global.environments.keys().find(profile.environment))
 	
 	var compiler = master_manager.active_profile.compiler
-	compiler_lbl.text = compiler.name + " (" + compiler.version + ")"
+	var lblText = compiler.name + " (" + compiler.version + ")"
+	if (compiler.name == ""):
+		lblText = "Default (-)"
+	compiler_lbl.text = lblText
 
 
 func _update_envs():
@@ -128,11 +137,13 @@ func _select_compiler() -> void:
 	
 func _on_compiler_selected(index: int) -> void:
 	var newCompiler = compilers[index]
-	var compiler = master_manager.active_profile.compiler
-	compiler.name = newCompiler.name
-	compiler.path = newCompiler.path
-	compiler.version = newCompiler.version
-
+	var compilerProfile = master_manager.active_profile.compiler
+	compilerProfile.name = newCompiler.name
+	compilerProfile.path = newCompiler.path
+	compilerProfile.version = newCompiler.version
+	sketch_manager.set_compiler(compilerProfile)
+	_save_profile()
+	
 
 func _process(_delta) -> void:
 	_reflect_profile()

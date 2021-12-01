@@ -112,7 +112,7 @@ Array Toolchain::find_compilers() {
     Array result;
 
     auto compilerDefault = make_ref<Toolchain::CompilerInformation>();
-    compilerDefault->name = "Default compiler";
+    compilerDefault->name = "Default";
     compilerDefault->path = "-";
     compilerDefault->version = "-";
     result.push_back(compilerDefault);

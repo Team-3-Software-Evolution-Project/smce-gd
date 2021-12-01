@@ -63,6 +63,7 @@ func _ready() -> void:
 	profile_screen_toggle.connect("button_down", self, "_toggle_profile_control", [false])
 	
 	profile_control.master_manager = master_manager
+	profile_control.sketch_manager = sketch_manager
 
 
 func _toggle_profile_control(show: bool) -> void:
