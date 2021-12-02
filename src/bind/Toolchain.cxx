@@ -119,12 +119,6 @@ void Toolchain::set_free() {
 Array Toolchain::find_compilers() {
     Array result;
 
-    auto compilerDefault = make_ref<Toolchain::CompilerInformation>();
-    compilerDefault->name = "Default";
-    compilerDefault->path = "-";
-    compilerDefault->version = "-";
-    result.push_back(compilerDefault);
-
     auto compilers = tc->find_compilers();
     for (const smce::Toolchain::CompilerInformation& ci : compilers) {
         auto compiler = Toolchain::CompilerInformation::from(ci);

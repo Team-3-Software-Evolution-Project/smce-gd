@@ -30,8 +30,7 @@ onready var save_btn: Button = $VBoxContainer/MarginContainer/VBoxContainer/HBox
 onready var world_list: OptionButton = $VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/Worlds
 onready var sketches_label: Label = $VBoxContainer/MarginContainer/VBoxContainer/Sketches
 onready var boards_label: Label = $VBoxContainer/MarginContainer/VBoxContainer/Boards
-onready var compiler_lbl: Label = $VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer3/Compiler
-onready var compiler_btn: MenuButton = $VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer3/SelectCompiler
+onready var compiler_list: OptionButton = $VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer3/Compilers
 
 onready var version_label: Label = $VBoxContainer/MarginContainer/Version
 
@@ -41,6 +40,8 @@ var master_manager = null setget set_master_manager
 func set_master_manager(mngr) -> void:
 	master_manager = mngr
 	_reflect_profile()
+	_init_compiler_list()
+	_select_compiler_from_profile()
 	
 var sketch_manager = null
 
@@ -55,14 +56,12 @@ func _ready():
 	save_btn.connect("pressed", self, "_save_profile")
 	profile_name_input.connect("text_changed", self, "_change_profile_name")
 	world_list.connect("item_selected", self, "_on_world_selected")
-	compiler_btn.connect("pressed", self, "_select_compiler")
-	compiler_btn.get_popup().connect("id_pressed", self, "_on_compiler_selected")
+	compiler_list.connect("item_selected", self, "_on_compiler_selected")
 	version_label.text = "SMCE-gd: %s" % Global.version
 	
-	profile.compiler.name = "Default (-)"
 	_update_envs()
-
-
+			
+			
 func _reflect_profile() -> void:
 	var profile: ProfileConfig = master_manager.active_profile
 	
@@ -83,18 +82,39 @@ func _reflect_profile() -> void:
 	sketches_label.text = "Sketches: %d" % map.size()
 
 	world_list.select(Global.environments.keys().find(profile.environment))
-	
-	var compiler = master_manager.active_profile.compiler
-	var lblText = compiler.name + " (" + compiler.version + ")"
-	if (compiler.name == ""):
-		lblText = "Default (-)"
-	compiler_lbl.text = lblText
 
 
+func _init_compiler_list() -> void:
+	compilers = Toolchain.new().find_compilers()
+	if (compilers.empty()):
+		var noCompiler = CompilerInformation.new()
+		noCompiler.name = "-"
+		noCompiler.version = "-"
+		compilers.insert(0, noCompiler)
+		compiler_list.add_item(noCompiler.name)
+	else:
+		var defaultCompiler = CompilerInformation.new()
+		defaultCompiler.name = "Default"
+		defaultCompiler.version = "-"
+		compilers.insert(0, defaultCompiler)
+		for compiler in compilers:
+			compiler_list.add_item(compiler.name + " (" + compiler.version + ")")
+			
+			
+func _select_compiler_from_profile() -> void:	
+	var currentCompiler = master_manager.active_profile.compiler
+	for i in range(compilers.size()):
+		var compiler = compilers[i]
+		if (compiler.name == currentCompiler.name 
+			and compiler.version == currentCompiler.version):
+			compiler_list.select(i)
+			break
+		
+		
 func _update_envs():
 	for env in Global.environments.keys():
 		world_list.add_item(env)
-
+	
 
 func _switch_profile() -> void:
 	master_manager.show_profile_select()
@@ -124,13 +144,6 @@ func _on_world_selected(index: int) -> void:
 	master_manager.active_profile.environment = world_list.get_item_text(index)
 	master_manager.load_profile(master_manager.active_profile)
 	
-
-func _select_compiler() -> void:
-	compiler_btn.get_popup().clear()
-	compilers = Toolchain.new().find_compilers()
-	for compiler in compilers:
-		compiler_btn.get_popup().add_item(compiler.name + " (" + compiler.version + ")")
-
 	
 func _on_compiler_selected(index: int) -> void:
 	var newCompiler = compilers[index]
@@ -138,8 +151,7 @@ func _on_compiler_selected(index: int) -> void:
 	compilerProfile.name = newCompiler.name
 	compilerProfile.path = newCompiler.path
 	compilerProfile.version = newCompiler.version
-	sketch_manager.set_compiler(compilerProfile)
-	_save_profile()
+	sketch_manager.set_compiler(master_manager.active_profile.compiler)
 	
 
 func _process(_delta) -> void:
