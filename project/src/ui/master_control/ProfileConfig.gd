@@ -22,9 +22,11 @@ var environment: String = "playground/Playground"
 var compiler: CompilerInformation = CompilerInformation.new()
 var slots: Array = []
 
+
 func type_info() -> Dictionary:
 	return {
 		"slots": SmceHud.Slot,
+		"compiler": CompilerInformation
 	}
 
 
