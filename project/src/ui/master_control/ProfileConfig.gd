@@ -19,11 +19,14 @@ class_name ProfileConfig
 
 var profile_name: String = "No Name"
 var environment: String = "playground/Playground"
+var compiler: CompilerInformation = CompilerInformation.new()
 var slots: Array = []
+
 
 func type_info() -> Dictionary:
 	return {
 		"slots": SmceHud.Slot,
+		"compiler": CompilerInformation
 	}
 
 
@@ -35,6 +38,10 @@ func is_equal(other) -> bool:
 		return false
 	
 	if other.environment != environment:
+		return false
+		
+	if (other.compiler.name != compiler.name 
+		or other.compiler.version != compiler.version):
 		return false
 	
 	for i in range(slots.size()):

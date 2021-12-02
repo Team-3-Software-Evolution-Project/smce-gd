@@ -43,6 +43,19 @@ class Toolchain : public Node {
     static void _register_methods();
     void _init();
 
+    class CompilerInformation : public Reference {
+        GODOT_CLASS(CompilerInformation, Reference);
+      public:
+        String name;
+        String path;
+        String version;
+
+        static void _register_methods();
+        void _init() {}
+
+        static Ref<CompilerInformation> from(const smce::Toolchain::CompilerInformation& ci);
+    };
+
     smce::Toolchain& native() { return *tc; }
 
     Ref<GDResult> init(String resource_dir);
@@ -58,6 +71,9 @@ class Toolchain : public Node {
     bool compile(Ref<Sketch> sketch);
 
     void set_free();
+
+    Array find_compilers();
+    bool select_compiler(Ref<Toolchain::CompilerInformation> selected_compiler);
 };
 
 } // namespace godot
