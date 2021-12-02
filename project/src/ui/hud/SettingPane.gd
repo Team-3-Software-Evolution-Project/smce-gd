@@ -86,31 +86,25 @@ func _reflect_profile() -> void:
 
 func _init_compiler_list() -> void:
 	compilers = Toolchain.new().find_compilers()
-	if (compilers.empty()):
-		var noCompiler = CompilerInformation.new()
-		noCompiler.name = "-"
-		noCompiler.version = "-"
-		compilers.insert(0, noCompiler)
-		compiler_list.add_item(noCompiler.name)
-	else:
-		var defaultCompiler = CompilerInformation.new()
-		defaultCompiler.name = "Default"
-		defaultCompiler.version = "-"
-		compilers.insert(0, defaultCompiler)
-		for compiler in compilers:
-			compiler_list.add_item(compiler.name + " (" + compiler.version + ")")
-			
-			
-func _select_compiler_from_profile() -> void:	
+	var defaultCompiler = CompilerInformation.new()
+	defaultCompiler.name = "Default"
+	defaultCompiler.version = "-"
+	compilers.insert(0, defaultCompiler)
+	for compiler in compilers:
+		compiler_list.add_item(compiler.name + " (" + compiler.version + ")")
+
+
+func _select_compiler_from_profile() -> void:
 	var currentCompiler = master_manager.active_profile.compiler
 	for i in range(compilers.size()):
 		var compiler = compilers[i]
 		if (compiler.name == currentCompiler.name 
 			and compiler.version == currentCompiler.version):
+			sketch_manager.set_compiler(currentCompiler)
 			compiler_list.select(i)
 			break
-		
-		
+
+
 func _update_envs():
 	for env in Global.environments.keys():
 		world_list.add_item(env)

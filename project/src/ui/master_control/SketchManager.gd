@@ -23,6 +23,8 @@ signal sketch_added
 var sketches: Dictionary = {}
 var toolchains: Dictionary = {}
 
+var compiler: CompilerInformation = null
+
 
 func get_sketch(path: String):
 	if sketches.has(path):
@@ -54,6 +56,7 @@ func make_sketch(path: String):
 	
 	var toolchain = Toolchain.new()
 	add_child(toolchain)
+	toolchain.select_compiler(compiler)
 	
 	var res = toolchain.init(Global.user_dir)
 	
@@ -69,7 +72,8 @@ func make_sketch(path: String):
 	return GDResult.new()
 
 
-func set_compiler(compiler: CompilerInformation):
-	for toolchain in toolchains:
-		toolchain.select_compiler(compiler)
+func set_compiler(newCompiler: CompilerInformation):
+	compiler = newCompiler
+	for key in toolchains:
+		toolchains[key].select_compiler(newCompiler)
 		
